@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        button { padding: 12px 25px; background: #1e3a8a; color: white; border: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Welcome, Admin</h1>
+    <a href="{{ url_for('new_invoice') }}"><button>New Invoice</button></a>
+    <a href="{{ url_for('logout') }}"><button style="background:red;">Logout</button></a>
+    <h2>Recent Invoices</h2>
+    <ul>
+    {% for p in payments[-5:] %}
+        <li>{{ p['invoice_no'] }} - {{ p['student_name'] }} - {{ p['amount'] }} TSh</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

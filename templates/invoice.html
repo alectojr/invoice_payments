@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .invoice { max-width: 700px; margin: auto; padding: 30px; border: 3px solid #1e3a8a; }
+        .qr { text-align: center; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="invoice">
+        <h1>BRILLIANT DRIVING SCHOOL</h1>
+        <h2>OFFICIAL INVOICE</h2>
+        <p><strong>Invoice:</strong> {{ payment.invoice_no }}</p>
+        <p><strong>Date:</strong> {{ payment.date }}</p>
+        <p><strong>Student:</strong> {{ payment.student_name }}</p>
+        <p><strong>Course:</strong> {{ payment.course }}</p>
+        <p><strong>Payment:</strong> {{ payment.payment_type }}</p>
+        <h2>Amount: {{ payment.amount }} TSh</h2>
+        <div class="qr">
+            <img src="data:image/png;base64,{{ qr_base64 }}" width="200">
+        </div>
+        <button onclick="window.print()">Print Invoice</button>
+    </div>
+</body>
+</html>
