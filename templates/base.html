@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brilliant Driving School</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(to right, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        nav {
+            background: #f8fafc;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        nav a {
+            margin-right: 20px;
+            text-decoration: none;
+            color: #1e40af;
+            font-weight: 500;
+        }
+        .content { padding: 30px; }
+        button, input, select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+        }
+        button {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button:hover { background: #2c5282; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>BRILLIANT DRIVING SCHOOL</h1>
+        <p>Student Payment System</p>
+    </div>
+    <div class="container">
+        <nav>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('new_invoice') }}">+ New Invoice</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+        <div class="content">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for msg in messages %}
+                        <p style="color: green; background:#d1fae5; padding:10px; border-radius:8px;">{{ msg }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

@@ -9,18 +9,43 @@
     </style>
 </head>
 <body>
-    <div class="invoice">
-        <h1>BRILLIANT DRIVING SCHOOL</h1>
-        <h2>OFFICIAL INVOICE</h2>
-        <p><strong>Invoice:</strong> {{ payment.invoice_no }}</p>
-        <p><strong>Date:</strong> {{ payment.date }}</p>
-        <p><strong>Student:</strong> {{ payment.student_name }}</p>
-        <p><strong>Course:</strong> {{ payment.course }}</p>
-        <p><strong>Payment:</strong> {{ payment.payment_type }}</p>
-        <h2>Amount: {{ payment.amount }} TSh</h2>
-        <div class="qr">
-            <img src="data:image/png;base64,{{ qr_base64 }}" width="200">
-        </div>
+    {% extends "base.html" %}
+{% block content %}
+<div style="max-width: 700px; margin: auto; background: white; padding: 40px; border: 4px solid #1e3a8a; border-radius: 15px;">
+    <h1 style="text-align:center; color:#1e3a8a;">BRILLIANT DRIVING SCHOOL</h1>
+    <h2 style="text-align:center;">OFFICIAL PAYMENT INVOICE</h2>
+    <hr>
+
+    <p><strong>Invoice Number:</strong> {{ payment.invoice_no }}</p>
+    <p><strong>Date:</strong> {{ payment.date }}</p>
+    <hr>
+    
+    <h3>Student Details</h3>
+    <p><strong>Name:</strong> {{ payment.student_name }}</p>
+    <p><strong>Course:</strong> {{ payment.course }}</p>
+    <p><strong>Payment For:</strong> {{ payment.payment_type }}</p>
+    
+    <h2 style="color: #27ae60; text-align:center;">
+        Amount Paid: {{ payment.amount }} TSh
+    </h2>
+
+    <div style="text-align:center; margin: 30px 0;">
+        <img src="data:image/png;base64,{{ qr_base64 }}" width="200" alt="QR Code">
+        <p><strong>Scan to Verify Invoice</strong></p>
+    </div>
+
+    <button onclick="window.print()" style="width:100%; padding:15px; font-size:18px;">
+        🖨️ Print Invoice
+    </button>
+</div>
+
+<style>
+    @media print {
+        body * { visibility: hidden; }
+        div[style*="max-width: 700px"] * { visibility: visible; }
+    }
+</style>
+{% endblock %}  
         <button onclick="window.print()">Print Invoice</button>
     </div>
 </body>

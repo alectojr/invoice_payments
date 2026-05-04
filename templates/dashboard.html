@@ -8,14 +8,36 @@
     </style>
 </head>
 <body>
-    <h1>Welcome, Admin</h1>
-    <a href="{{ url_for('new_invoice') }}"><button>New Invoice</button></a>
-    <a href="{{ url_for('logout') }}"><button style="background:red;">Logout</button></a>
-    <h2>Recent Invoices</h2>
-    <ul>
-    {% for p in payments[-5:] %}
-        <li>{{ p['invoice_no'] }} - {{ p['student_name'] }} - {{ p['amount'] }} TSh</li>
+    {% extends "base.html" %}
+{% block content %}
+<h2>Dashboard - Recent Payments</h2>
+<p><a href="{{ url_for('new_invoice') }}"><button style="width: auto;">+ New Invoice</button></a></p>
+
+<table border="1" cellpadding="12" cellspacing="0" style="width:100%; border-collapse: collapse;">
+    <tr style="background: #1e3a8a; color: white;">
+        <th>Invoice No</th>
+        <th>Student Name</th>
+        <th>Course</th>
+        <th>Payment Type</th>
+        <th>Amount</th>
+        <th>Date</th>
+    </tr>
+    {% for p in payments %}
+    <tr>
+        <td><strong>{{ p.invoice_no }}</strong></td>
+        <td>{{ p.student_name }}</td>
+        <td>{{ p.course }}</td>
+        <td>{{ p.payment_type }}</td>
+        <td>{{ p.amount | int }} TSh</td>
+        <td>{{ p.date }}</td>
+    </tr>
     {% endfor %}
+</table>
+
+{% if not payments %}
+<p>No payments recorded yet.</p>
+{% endif %}
+{% endblock %}}
     </ul>
 </body>
 </html>
