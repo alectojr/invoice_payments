@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block body_class %}home{% endblock %}
+{% block content %}
+<div class="center-pane hero-card">
+    <span class="section-lead">Welcome</span>
+    <h2>Brilliant Driving School</h2>
+    <p>Login as admin to manage the system, or login as a user to view your records.</p>
+    <div class="button-row spaced-row">
+        <a href="{{ url_for('admin_login') }}" class="btn btn-primary">Admin Login</a>
+        <a href="{{ url_for('login') }}" class="btn btn-secondary">User Login</a>
+    </div>
+    <div class="footer-links centered-footer">
+        <a href="{{ url_for('signup') }}">Create a new account</a>
+    </div>
+</div>
+{% endblock %}

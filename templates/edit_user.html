@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block body_class %}page-form{% endblock %}
+{% block content %}
+<div class="hero-card page-panel">
+    <div class="center-pane">
+        <span class="section-lead">Edit User</span>
+        <h2>Edit User Account</h2>
+        <p>Update user details carefully before saving.</p>
+    </div>
+    <form method="POST" class="form-grid form-spacing">
+        <input class="form-field" type="text" name="username" value="{{ user.username }}" required>
+        <input class="form-field" type="password" name="password" value="{{ user.password }}" required>
+        <input class="form-field" type="text" name="full_name" value="{{ user.full_name }}" required>
+        <input class="form-field" type="text" name="phone" value="{{ user.phone }}" required>
+        <div class="button-row button-row-space">
+            <a href="{{ url_for('manage_users') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update User</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

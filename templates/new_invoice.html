@@ -1,66 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Invoice - Brilliant Driving School</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        }
-        h2 { color: #1e3a8a; text-align: center; }
-        input, select, button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        button {
-            background: #1e3a8a;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover { background: #2c5282; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        {% extends "base.html" %}
+{% extends "base.html" %}
+{% block body_class %}page-form{% endblock %}
 {% block content %}
-<h2>New Payment Invoice</h2>
-<form method="POST">
-    <input type="text" name="student_name" placeholder="Student Full Name" required><br>
-    
-    <select name="course" required>
-        <option value="">Select Course</option>
-        <option value="Basic">Basic</option>
-        <option value="HGV">Heavy Goods Vehicles (HGV)</option>
-        <option value="PSV">Public Service Vehicles (PSV)</option>
-    </select><br>
-    
-    <input type="text" name="payment_type" placeholder="Payment Type (e.g. Registration Fees)" required><br>
-    <input type="number" name="amount" placeholder="Amount (TSh)" required><br>
-    
-    <button type="submit">Generate Invoice</button>
-</form>
-{% endblock %}
-        <br>
-        <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+<div class="hero-card page-panel">
+    <div class="center-pane">
+        <span class="section-lead">Invoice</span>
+        <h2>New Payment Invoice</h2>
+        <p>Enter details below to create a new payment record for the driving school.</p>
     </div>
-</body>
-</html>
+    <form method="POST" class="form-grid form-spacing">
+        <input class="form-field" type="text" name="student_name" placeholder="Student Full Name" required>
+        <input class="form-field" type="text" name="phone" placeholder="Student Phone Number (+255...)" required>
+        <select class="form-field" name="course" required>
+            <option value="">Select Course</option>
+            <option value="Basic">Basic</option>
+            <option value="HGV">Heavy Goods Vehicles (HGV)</option>
+            <option value="PSV">Public Service Vehicles (PSV)</option>
+        </select>
+        <select class="form-field" name="payment_type" required>
+            <option value="">Select Payment Type</option>
+            <option value="Refresher 1 Week">Refresher Course - 1 Week (100,000 TSh)</option>
+            <option value="Refresher 2 Weeks">Refresher Course - 2 Weeks (150,000 TSh)</option>
+            <option value="Full Course">Full Course Payment</option>
+        </select>
+        <div class="button-row button-row-space">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Generate Invoice</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
