@@ -11,14 +11,24 @@
         <img src="/static/logo.png" alt="Logo" class="logo" onerror="this.src='https://via.placeholder.com/80?text=DS';">
         <h1>BRILLIANT DRIVING SCHOOL</h1>
         <p>Payment Management System</p>
+        <div class="language-switcher">
+            <a href="{{ url_for('set_language', lang='en') }}" class="lang-link {% if session.get('language', 'en') == 'en' %}active{% endif %}">EN</a> |
+            <a href="{{ url_for('set_language', lang='sw') }}" class="lang-link {% if session.get('language', 'sw') == 'sw' %}active{% endif %}">SW</a>
+        </div>
     </div>
 
     <div class="container">
         <nav>
-            <a href="{{ url_for('dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('new_invoice') }}">+ New Invoice</a>
-            <a href="{{ url_for('signup') }}">Create Account</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
+            <a href="{{ url_for('dashboard') }}">{{ translate('dashboard') }}</a>
+            {% if user_type == 'admin' %}
+                <a href="{{ url_for('new_invoice') }}">{{ translate('new_invoice') }}</a>
+                <a href="{{ url_for('manage_users') }}">{{ translate('manage_users') }}</a>
+            {% endif %}
+            {% if user_type in ['admin', 'staff'] %}
+                <a href="{{ url_for('staff_login') }}">{{ translate('staff_login') }}</a>
+            {% endif %}
+            <a href="{{ url_for('signup') }}">{{ translate('signup') }}</a>
+            <a href="{{ url_for('logout') }}">{{ translate('logout') }}</a>
         </nav>
 
         <div class="content">

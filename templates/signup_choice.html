@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block body_class %}signup{% endblock %}
+{% block content %}
+<div class="center-pane hero-card">
+    <span class="section-lead">Sign Up</span>
+    <h2>Create a new account</h2>
+    <p>Choose the account type that matches your role at Brilliant Driving School.</p>
+    <div class="button-row spaced-row">
+        <a href="{{ url_for('student_signup') }}" class="btn btn-primary">Student Signup</a>
+        <a href="{{ url_for('staff_signup') }}" class="btn btn-secondary">Staff Signup</a>
+    </div>
+    <div class="footer-links centered-footer">
+        <a href="{{ url_for('home') }}">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block body_class %}page-form{% endblock %}
+{% block content %}
+<div class="hero-card page-panel">
+    <div class="center-pane">
+        <span class="section-lead">Invoice Verification</span>
+        <h2>Verify Invoice Authenticity</h2>
+        <p>Check if an invoice has been tampered with or is authentic.</p>
+    </div>
+
+    <div class="verification-result {% if verified %}success{% else %}error{% endif %}">
+        <div class="verification-icon">
+            {% if verified %}
+                <span class="checkmark">✓</span>
+            {% else %}
+                <span class="cross">✗</span>
+            {% endif %}
+        </div>
+        <div class="verification-message">
+            <h3>{{ message }}</h3>
+            {% if payment %}
+            <div class="invoice-summary">
+                <p><strong>Invoice:</strong> {{ payment.invoice_no }}</p>
+                <p><strong>Student:</strong> {{ payment.student_name }}</p>
+                <p><strong>Amount:</strong> {{ "{:,}".format(payment.amount) }} TSh</p>
+                <p><strong>Date:</strong> {{ payment.date }}</p>
+                <p><strong>Verification Code:</strong> {{ payment.verification_code }}</p>
+                {% if verified %}
+                <p><strong>Status:</strong> <span class="authentic-badge">AUTHENTIC</span></p>
+                {% else %}
+                <p><strong>Status:</strong> <span class="tampered-badge">TAMPERED/INVALID</span></p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="verification-info">
+        <h4>How Invoice Security Works:</h4>
+        <ul>
+            <li><strong>Cryptographic Hash:</strong> SHA-256 hash of all invoice data</li>
+            <li><strong>Digital Signature:</strong> HMAC signature for authenticity verification</li>
+            <li><strong>Verification Code:</strong> Unique 8-character code for manual verification</li>
+            <li><strong>Security Pattern:</strong> Unique hexadecimal pattern for visual verification</li>
+            <li><strong>Timestamp:</strong> Exact creation time prevents backdating</li>
+        </ul>
+        <p><em>This verification system makes it nearly impossible to forge or alter invoices without detection.</em></p>
+    </div>
+</div>
+
+<style>
+.verification-result {
+    text-align: center;
+    padding: 30px;
+    border-radius: 15px;
+    margin: 20px 0;
+    border: 3px solid;
+}
+
+.verification-result.success {
+    background: #f0f9f0;
+    border-color: #10b981;
+    color: #065f46;
+}
+
+.verification-result.error {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+.verification-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.checkmark {
+    color: #10b981;
+}
+
+.cross {
+    color: #ef4444;
+}
+
+.invoice-summary {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.authentic-badge {
+    background: #10b981;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.tampered-badge {
+    background: #ef4444;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.verification-info {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 30px;
+    text-align: left;
+}
+
+.verification-info h4 {
+    color: #1e3a8a;
+    margin-bottom: 15px;
+}
+
+.verification-info ul {
+    margin: 15px 0;
+}
+
+.verification-info li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.verification-info em {
+    color: #6b7280;
+    font-style: italic;
+}
+</style>
+{% endblock %}

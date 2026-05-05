@@ -374,3 +374,34 @@ tr:hover {
     font-style: italic;
     font-size: 14px;
 }
+
+/* Language switcher */
+.language-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 14px;
+}
+
+.lang-link {
+    color: #ffffff;
+    text-decoration: none;
+    margin: 0 5px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.lang-link:hover, .lang-link.active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Warning button for password reset */
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+}

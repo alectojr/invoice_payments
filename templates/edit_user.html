@@ -8,10 +8,30 @@
         <p>Update user details carefully before saving.</p>
     </div>
     <form method="POST" class="form-grid form-spacing">
-        <input class="form-field" type="text" name="username" value="{{ user.username }}" required>
-        <input class="form-field" type="password" name="password" value="{{ user.password }}" required>
-        <input class="form-field" type="text" name="full_name" value="{{ user.full_name }}" required>
-        <input class="form-field" type="text" name="phone" value="{{ user.phone }}" required>
+        <div class="form-field-group">
+            <label class="form-label">Username</label>
+            <input class="form-field" type="text" name="username" value="{{ user.username }}" required>
+        </div>
+        <div class="form-field-group">
+            <label class="form-label">Password</label>
+            <input class="form-field" type="password" name="password" value="{{ user.password }}" required>
+        </div>
+        <div class="form-field-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-field" type="text" name="full_name" value="{{ user.full_name or '' }}">
+        </div>
+        <div class="form-field-group">
+            <label class="form-label">Phone</label>
+            <input class="form-field" type="text" name="phone" value="{{ user.phone or '' }}">
+        </div>
+        <div class="form-field-group">
+            <label class="form-label">Role</label>
+            <select class="form-field" name="role" required>
+                <option value="student" {% if user.role == 'student' %}selected{% endif %}>Student</option>
+                <option value="staff" {% if user.role == 'staff' %}selected{% endif %}>Staff</option>
+                <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
         <div class="button-row button-row-space">
             <a href="{{ url_for('manage_users') }}" class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">Update User</button>

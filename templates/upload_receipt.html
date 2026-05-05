@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block body_class %}page-form{% endblock %}
+{% block content %}
+<div class="hero-card page-panel">
+    <div class="center-pane">
+        <span class="section-lead">{{ translate('upload_receipt') }}</span>
+        <h2>Upload Receipt for {{ payment.student_name }}</h2>
+        <p>Upload a scanned receipt (PDF only) for this payment.</p>
+    </div>
+    <form method="POST" enctype="multipart/form-data" class="form-grid form-spacing">
+        <div class="form-field-group">
+            <label class="form-label">Select PDF File</label>
+            <input class="form-field" type="file" name="file" accept=".pdf" required>
+            <small class="form-help">Only PDF files are allowed. Maximum file size: 10MB</small>
+        </div>
+        <div class="button-row">
+            <a href="{{ url_for('view_invoice', id=payment.id) }}" class="btn btn-secondary">{{ translate('cancel') }}</a>
+            <button type="submit" class="btn btn-primary">{{ translate('upload_receipt') }}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
