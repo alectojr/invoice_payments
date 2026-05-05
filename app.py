@@ -890,7 +890,7 @@ def upload_receipt(payment_id):
             db.session.commit()
             
             flash('Receipt uploaded successfully!', 'success')
-            return redirect(url_for('view_invoice', id=payment_id))
+            return redirect(url_for('view_invoice', invoice_no=payment.invoice_no))
         else:
             flash('Invalid file type. Only PDF files are allowed.', 'error')
     

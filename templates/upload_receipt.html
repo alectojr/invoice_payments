@@ -14,7 +14,7 @@
             <small class="form-help">Only PDF files are allowed. Maximum file size: 10MB</small>
         </div>
         <div class="button-row">
-            <a href="{{ url_for('view_invoice', id=payment.id) }}" class="btn btn-secondary">{{ translate('cancel') }}</a>
+            <a href="{{ url_for('view_invoice', invoice_no=payment.invoice_no) }}" class="btn btn-secondary">{{ translate('cancel') }}</a>
             <button type="submit" class="btn btn-primary">{{ translate('upload_receipt') }}</button>
         </div>
     </form>
