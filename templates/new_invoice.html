@@ -2,27 +2,23 @@
 {% block body_class %}page-form{% endblock %}
 {% block content %}
 <div class="hero-card page-panel">
-    <div class="center-pane">
-        <span class="section-lead">Invoice</span>
-        <h2>New Payment Invoice</h2>
-        <p>Enter details below to create a new payment record for the driving school.</p>
-    </div>
-    <form method="POST" class="form-grid form-spacing">
-        <input class="form-field" type="text" name="student_name" placeholder="Student Full Name" required>
-        <input class="form-field" type="text" name="phone" placeholder="Student Phone Number (+255...)" required>
-        <select class="form-field" name="course" required>
-            <option value="">Select Course</option>
-            <option value="Basic">Basic</option>
-            <option value="HGV">Heavy Goods Vehicles (HGV)</option>
-            <option value="PSV">Public Service Vehicles (PSV)</option>
+    <h2>New Invoice</h2>
+    <form method="POST">
+        <select class="form-field" name="student_id" required>
+            <option value="">Select Student</option>
+            {% for student in students %}
+            <option value="{{ student.id }}">{{ student.registration_number }} - {{ student.full_name }}</option>
+            {% endfor %}
         </select>
+        
         <select class="form-field" name="payment_type" required>
             <option value="">Select Payment Type</option>
-            <option value="Refresher 1 Week">Refresher Course - 1 Week (100,000 TSh)</option>
-            <option value="Refresher 2 Weeks">Refresher Course - 2 Weeks (150,000 TSh)</option>
-            <option value="Full Course">Full Course Payment</option>
+            <option value="Refresher 1 Week">Refresher 1 Week (100,000 TSh)</option>
+            <option value="Refresher 2 Weeks">Refresher 2 Weeks (150,000 TSh)</option>
+            <option value="Full Course">Full Course</option>
         </select>
-        <div class="button-row button-row-space">
+        
+        <div class="button-row">
             <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">Generate Invoice</button>
         </div>

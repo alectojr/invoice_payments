@@ -8,60 +8,43 @@
 </head>
 <body class="{% block body_class %}{% endblock %}">
     <div class="header">
-        <img src="/static/logo.png" alt="Logo" class="logo" onerror="this.src='https://via.placeholder.com/80?text=DS';">
+        <img src="/static/logo.png" alt="Logo" class="logo">
         <h1>BRILLIANT DRIVING SCHOOL</h1>
-        <p>Payment Management System</p>
+        <p>Student & Payment Management System</p>
     </div>
 
     <div class="container">
         <nav>
             <a href="{{ url_for('dashboard') }}">{{ translate('dashboard') }}</a>
-            {% if user_type == 'admin' %}
-                <a href="{{ url_for('new_invoice') }}">{{ translate('new_invoice') }}</a>
-                <a href="{{ url_for('manage_users') }}">{{ translate('manage_users') }}</a>
-            {% endif %}
+            
             {% if user_type in ['admin', 'staff'] %}
-                <a href="{{ url_for('profile') }}">{{ translate('profile') }}</a>
+                <a href="{{ url_for('students_list') }}">Students</a>
+                <a href="{{ url_for('new_invoice') }}">New Invoice</a>
+                <a href="{{ url_for('manage_users') }}">Manage Users</a>
             {% endif %}
+            
             {% if user_type in ['admin', 'staff'] %}
-                <a href="{{ url_for('staff_login') }}">{{ translate('staff_login') }}</a>
+                <a href="{{ url_for('profile') }}">Profile</a>
             {% endif %}
+            
+            <a href="{{ url_for('register/student') }}">Student Registration</a>
+            
             {% if user_type %}
-                <a href="{{ url_for('request_password_reset') }}" style="color: orange; font-weight: bold;">Reset Password</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
             {% endif %}
-            <a href="{{ url_for('signup') }}">{{ translate('signup') }}</a>
-            <a href="{{ url_for('logout') }}">{{ translate('logout') }}</a>
         </nav>
 
         <div class="content">
-            {% block flash_messages %}
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, msg in messages %}
-                            <div class="flash {{ 'success' if category == 'success' else 'error' }}">{{ msg }}</div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            {% endblock %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, msg in messages %}
+                        <div class="flash {{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
             {% block content %}{% endblock %}
         </div>
     </div>
-
-    <script>
-        // Auto-hide flash messages after 5 seconds
-        document.addEventListener('DOMContentLoaded', function() {
-            const flashMessages = document.querySelectorAll('.flash');
-            flashMessages.forEach(function(message) {
-                setTimeout(function() {
-                    message.style.transition = 'opacity 0.5s ease-out';
-                    message.style.opacity = '0';
-                    setTimeout(function() {
-                        message.remove();
-                    }, 500);
-                }, 5000);
-            });
-        });
-    </script>
 </body>
 </html>

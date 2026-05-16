@@ -12,6 +12,7 @@ import hashlib
 import hmac
 import secrets
 
+
 from flask import Flask, render_template, request, redirect, url_for, flash, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import inspect, text
@@ -138,6 +139,60 @@ def normalize_phone(phone):
 with app.app_context():
     db.create_all()
     print("✅ Database ready with Student + Payment system")
+# ====================== SECURITY & INVOICE HELPERS ======================
+
+def generate_temp_password():
+    """Generate a random readable temporary password."""
+    fruits = ['apple', 'banana', 'orange', 'mango', 'pineapple',
+              'grape', 'strawberry', 'watermelon', 'peach', 'cherry']
+    return random.choice(fruits) + str(random.randint(10, 99))
+
+
+def generate_invoice_no():
+    """Generate unique invoice number"""
+    today = datetime.now().strftime('%Y%m%d')
+    prefix = f"BDS-{today}-"
+    latest = Payment.query.filter(Payment.invoice_no.like(f"{prefix}%")).order_by(Payment.invoice_no.desc()).first()
+    
+    if latest:
+        try:
+            last_number = int(latest.invoice_no.rsplit('-', 1)[1])
+            next_number = last_number + 1
+        except:
+            next_number = 1
+    else:
+        next_number = 1
+    
+    invoice_no = f"{prefix}{next_number:04d}"
+    while Payment.query.filter_by(invoice_no=invoice_no).first():
+        next_number += 1
+        invoice_no = f"{prefix}{next_number:04d}"
+    return invoice_no
+
+
+def generate_security_hash(invoice_no, student_name, course, payment_type, amount, date):
+    data = f"{invoice_no}|{student_name}|{course}|{payment_type}|{amount}|{date}|{app.secret_key}"
+    return hashlib.sha256(data.encode()).hexdigest()
+
+
+def generate_digital_signature(security_hash):
+    return hmac.new(
+        app.secret_key.encode(), security_hash.encode(), hashlib.sha256
+    ).hexdigest()
+
+
+def generate_verification_code():
+    return ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+
+
+def generate_security_pattern():
+    return secrets.token_hex(16)
+
+
+# Optional: Keep your SMS function if you want
+def send_invoice_sms(course, student_name=None):
+    # You can keep your original SMS function here
+    pass
 
 # ====================== ROUTES ======================
 
@@ -248,6 +303,74 @@ def approve_student(sid):
     db.session.commit()
     flash('Student approved!', 'success')
     return redirect(url_for('students_list'))
+
+@app.route('/students/reject/<int:sid>')
+def reject_student(sid):
+    if session.get('user_type') not in ['admin', 'staff']:
+        flash('Access denied!', 'error')
+        return redirect(url_for('students_list'))
+    
+    student = Student.query.get_or_404(sid)
+    student.status = 'Rejected'
+    student.rejected_by = session['user']
+    student.rejected_at = datetime.utcnow()
+    db.session.commit()
+    
+    flash(f'Student {student.full_name} has been rejected.', 'error')
+    return redirect(url_for('students_list'))
+
+@app.route('/new_invoice', methods=['GET', 'POST'])
+def new_invoice():
+    if 'user' not in session or session.get('user_type') != 'admin':
+        flash('Access denied!', 'error')
+        return redirect(url_for('dashboard'))
+
+    students = Student.query.filter_by(status='Approved').all()
+
+    if request.method == 'POST':
+        student_id = request.form.get('student_id')
+        student = Student.query.get_or_404(student_id)
+        
+        payment_type = request.form.get('payment_type')
+        course = student.course
+
+        amount = 0
+        if payment_type == 'Refresher 1 Week':
+            amount = 100000
+        elif payment_type == 'Refresher 2 Weeks':
+            amount = 150000
+        elif payment_type == 'Full Course':
+            amount = 250000 if course != 'HGV' else 350000
+
+        invoice_no = generate_invoice_no()
+        date_str = datetime.now().strftime('%d %B %Y')
+
+        # Security fields
+        security_hash = generate_security_hash(invoice_no, student.full_name, course, payment_type, amount, date_str)
+        digital_signature = generate_digital_signature(security_hash)
+        verification_code = generate_verification_code()
+        security_pattern = generate_security_pattern()
+
+        new_payment = Payment(
+            invoice_no=invoice_no,
+            student_name=student.full_name,
+            course=course,
+            payment_type=payment_type,
+            amount=amount,
+            status='Paid',
+            date=date_str,
+            security_hash=security_hash,
+            digital_signature=digital_signature,
+            verification_code=verification_code,
+            security_pattern=security_pattern,
+        )
+        db.session.add(new_payment)
+        db.session.commit()
+
+        flash(f'Invoice {invoice_no} created for {student.full_name}', 'success')
+        return redirect(url_for('view_invoice', invoice_no=invoice_no))
+
+    return render_template('new_invoice.html', students=students)
 
 # Keep all your original payment routes (new_invoice, view_invoice, etc.)
 
