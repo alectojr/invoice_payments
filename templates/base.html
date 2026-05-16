@@ -11,10 +11,6 @@
         <img src="/static/logo.png" alt="Logo" class="logo" onerror="this.src='https://via.placeholder.com/80?text=DS';">
         <h1>BRILLIANT DRIVING SCHOOL</h1>
         <p>Payment Management System</p>
-        <div class="language-switcher">
-            <a href="{{ url_for('set_language', lang='en') }}" class="lang-link {% if session.get('language', 'en') == 'en' %}active{% endif %}">EN</a> |
-            <a href="{{ url_for('set_language', lang='sw') }}" class="lang-link {% if session.get('language', 'sw') == 'sw' %}active{% endif %}">SW</a>
-        </div>
     </div>
 
     <div class="container">
@@ -25,7 +21,13 @@
                 <a href="{{ url_for('manage_users') }}">{{ translate('manage_users') }}</a>
             {% endif %}
             {% if user_type in ['admin', 'staff'] %}
+                <a href="{{ url_for('profile') }}">{{ translate('profile') }}</a>
+            {% endif %}
+            {% if user_type in ['admin', 'staff'] %}
                 <a href="{{ url_for('staff_login') }}">{{ translate('staff_login') }}</a>
+            {% endif %}
+            {% if user_type %}
+                <a href="{{ url_for('request_password_reset') }}" style="color: orange; font-weight: bold;">Reset Password</a>
             {% endif %}
             <a href="{{ url_for('signup') }}">{{ translate('signup') }}</a>
             <a href="{{ url_for('logout') }}">{{ translate('logout') }}</a>

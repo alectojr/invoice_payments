@@ -95,7 +95,11 @@
             <div class="receipt-item">
                 <span>{{ receipt.original_filename }}</span>
                 <a href="{{ url_for('uploaded_file', filename=receipt.filename) }}" target="_blank" class="btn btn-secondary btn-sm">View PDF</a>
+                {% if user_type == 'admin' %}
                 <small>Uploaded by {{ receipt.uploaded_by }} on {{ receipt.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                {% else %}
+                <small>Uploaded on {{ receipt.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                {% endif %}
             </div>
             {% endfor %}
         </div>

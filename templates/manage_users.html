@@ -19,6 +19,8 @@
                     <th>Full Name</th>
                     <th>Phone</th>
                     <th>Role</th>
+                    <th>PCI Info</th>
+                    <th>Profile Notes</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -30,6 +32,8 @@
                     <td>{{ user.full_name or 'N/A' }}</td>
                     <td>{{ user.phone or 'N/A' }}</td>
                     <td>{{ user.role.title() }}</td>
+                    <td><small>{{ user.pci_info or '-' }}</small></td>
+                    <td><small>{{ user.profile_notes or '-' }}</small></td>
                     <td>
                         <a href="{{ url_for('edit_user', id=user.id) }}" class="btn btn-tertiary">Edit</a>
                         {% if user.role == 'staff' and user.reset_requested %}

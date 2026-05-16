@@ -17,13 +17,9 @@
             <input class="form-field" type="text" value="{{ existing_payment.course }}" readonly>
         </div>
         <div class="form-field-group">
-            <label class="form-label">Payment Type</label>
-            <select class="form-field" name="payment_type" required>
-                <option value="">Select Payment Type</option>
-                <option value="Refresher 1 Week">Refresher 1 Week - TSh 100,000</option>
-                <option value="Refresher 2 Weeks">Refresher 2 Weeks - TSh 150,000</option>
-                <option value="Full Course">Full Course - TSh {{ "250,000" if existing_payment.course != "HGV" else "350,000" }}</option>
-            </select>
+            <label class="form-label">Amount</label>
+            <input class="form-field" type="number" name="amount" min="1" placeholder="Enter amount" required>
+            <small class="form-help">Set the amount for the additional payment.</small>
         </div>
         <div class="button-row button-row-space">
             <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>

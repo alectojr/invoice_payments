@@ -4,15 +4,10 @@
 <div class="center-pane hero-card">
     <span class="section-lead">Welcome</span>
     <h2>Brilliant Driving School</h2>
-    <p>Login as admin to manage the system, login as staff to assist with operations, or login as a student to view your records.</p>
+    <p>Choose your login type to access the payment management system.</p>
     <div class="button-row spaced-row">
-        <a href="{{ url_for('admin_login') }}" class="btn btn-primary">Admin Login</a>
-        <a href="{{ url_for('staff_login') }}" class="btn btn-secondary">Staff Login</a>
+        <a href="{{ url_for('staff_login') }}" class="btn btn-primary">Staff Login</a>
         <a href="{{ url_for('login') }}" class="btn btn-secondary">Student Login</a>
-    </div>
-    <div class="button-row spaced-row">
-        <a href="{{ url_for('student_signup') }}" class="btn btn-primary">Student Signup</a>
-        <a href="{{ url_for('staff_signup') }}" class="btn btn-secondary">Staff Signup</a>
     </div>
 </div>
 {% endblock %}

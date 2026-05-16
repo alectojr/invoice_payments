@@ -48,6 +48,8 @@ class User(db.Model):
     full_name = db.Column(db.String(150))
     phone = db.Column(db.String(20))
     role = db.Column(db.String(20), default="student")  # student, staff, admin
+    pci_info = db.Column(db.String(255))
+    profile_notes = db.Column(db.String(255))
     temp_password = db.Column(db.String(120))  # For password reset
     reset_requested = db.Column(db.Boolean, default=False)
 
@@ -110,6 +112,8 @@ def ensure_security_columns_exist():
 def ensure_user_columns_exist():
     expected_columns = [
         ('role', 'VARCHAR(20) DEFAULT "student"'),
+        ('pci_info', 'VARCHAR(255)'),
+        ('profile_notes', 'VARCHAR(255)'),
         ('temp_password', 'VARCHAR(120)'),
         ('reset_requested', 'BOOLEAN DEFAULT 0'),
     ]
@@ -236,6 +240,7 @@ def translate(key):
             'dashboard': 'Dashboard',
             'new_invoice': 'New Invoice',
             'manage_users': 'Manage Users',
+            'profile': 'Profile',
             'logout': 'Logout',
             'login': 'Login',
             'signup': 'Sign Up',
@@ -272,6 +277,7 @@ def translate(key):
             'dashboard': 'Dashibodi',
             'new_invoice': 'Ankara Mpya',
             'manage_users': 'Simamia Watumiaji',
+            'profile': 'Profaili',
             'logout': 'Ondoka',
             'login': 'Ingia',
             'signup': 'Jisajili',
@@ -422,14 +428,14 @@ def staff_login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username, role='staff').first()
+        user = User.query.filter(User.username == username, User.role.in_(['staff', 'admin'])).first()
         
         if user and user.password == password:
             session['user'] = username
-            session['user_type'] = 'staff'
-            flash('Staff login successful!', 'success')
+            session['user_type'] = user.role
+            flash('Login successful!', 'success')
             return redirect(url_for('dashboard'))
-        flash('Invalid staff credentials!', 'error')
+        flash('Invalid staff/admin credentials!', 'error')
     return render_template('staff_login.html')
 
 @app.route('/admin_login', methods=['GET', 'POST'])
@@ -437,7 +443,8 @@ def admin_login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        if username == "admin" and password == "admin123":
+        user = User.query.filter_by(username=username, role='admin').first()
+        if user and user.password == password:
             session['user'] = username
             session['user_type'] = 'admin'
             flash('Admin login successful!', 'success')
@@ -639,17 +646,16 @@ def add_payment(payment_id):
     existing_payment = Payment.query.get_or_404(payment_id)
     
     if request.method == 'POST':
-        payment_type = request.form.get('payment_type')
-        
-        # Auto amount calculation
-        amount = 0
-        if payment_type == "Refresher 1 Week":
-            amount = 100000
-        elif payment_type == "Refresher 2 Weeks":
-            amount = 150000
-        elif payment_type == "Full Course":
-            amount = 250000 if existing_payment.course != "HGV" else 350000
-        
+        try:
+            amount = int(request.form.get('amount', 0))
+        except ValueError:
+            amount = 0
+
+        if amount <= 0:
+            flash('Please enter a valid amount.', 'error')
+            return redirect(url_for('add_payment', payment_id=payment_id))
+
+        payment_type = f'Additional Payment for {existing_payment.course}'
         invoice_no = generate_invoice_no()
         date_str = datetime.now().strftime("%d %B %Y")
         
@@ -736,6 +742,30 @@ def manage_users():
     users = User.query.all()
     return render_template('manage_users.html', users=users)
 
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'user' not in session:
+        return redirect(url_for('home'))
+    if session.get('user_type') not in ['admin', 'staff']:
+        flash('Access denied! Profile is only available to staff and admin.', 'error')
+        return redirect(url_for('dashboard'))
+
+    user = User.query.filter_by(username=session.get('user')).first_or_404()
+    if request.method == 'POST':
+        user.full_name = request.form.get('full_name')
+        user.phone = request.form.get('phone')
+        
+        # Only admins can edit sensitive information
+        if session.get('user_type') == 'admin':
+            user.pci_info = request.form.get('pci_info')
+            user.profile_notes = request.form.get('profile_notes')
+        
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('profile.html', user=user)
+
 @app.route('/edit_user/<int:id>', methods=['GET', 'POST'])
 def edit_user(id):
     if 'user' not in session:
@@ -747,11 +777,20 @@ def edit_user(id):
     user = User.query.get_or_404(id)
     
     if request.method == 'POST':
+        new_role = request.form.get('role')
+        if new_role == 'admin' and user.role != 'admin':
+            admin_count = User.query.filter_by(role='admin').count()
+            if admin_count >= 3:
+                flash('Admin limit reached. Maximum 3 admins allowed.', 'error')
+                return redirect(url_for('edit_user', id=id))
+
         user.username = request.form.get('username')
         user.password = request.form.get('password')
         user.full_name = request.form.get('full_name')
         user.phone = request.form.get('phone')
-        user.role = request.form.get('role')
+        user.pci_info = request.form.get('pci_info')
+        user.profile_notes = request.form.get('profile_notes')
+        user.role = new_role
         db.session.commit()
         flash('User updated successfully!', 'success')
         return redirect(url_for('manage_users'))
@@ -806,13 +845,16 @@ def change_temp_password():
     
     return render_template('change_temp_password.html')
 
-@app.route('/request_password_reset', methods=['POST'])
+@app.route('/request_password_reset', methods=['GET', 'POST'])
 def request_password_reset():
     if 'user' not in session:
         return redirect(url_for('login'))
     
-    username = session.get('user')
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(username=session.get('user')).first()
+    
+    if request.method == 'GET':
+        # Show confirmation page
+        return render_template('request_password_reset.html', user=user)
     
     if user:
         if user.role == 'staff':

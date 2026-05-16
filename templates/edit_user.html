@@ -24,6 +24,19 @@
             <label class="form-label">Phone</label>
             <input class="form-field" type="text" name="phone" value="{{ user.phone or '' }}">
         </div>
+        {% if user_type == 'admin' %}
+        <div class="form-field-group">
+            <label class="form-label">Password</label>
+            <input class="form-field" type="password" name="password" value="{{ user.password }}" required>
+        </div>
+        <div class="form-field-group">
+            <label class="form-label">PCI Info</label>
+            <input class="form-field" type="text" name="pci_info" value="{{ user.pci_info or '' }}" placeholder="PCI / profile identifier">
+        </div>
+        <div class="form-field-group">
+            <label class="form-label">Profile Notes</label>
+            <textarea class="form-field" name="profile_notes" rows="3" placeholder="Other profile details">{{ user.profile_notes or '' }}</textarea>
+        </div>
         <div class="form-field-group">
             <label class="form-label">Role</label>
             <select class="form-field" name="role" required>
@@ -32,6 +45,12 @@
                 <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
             </select>
         </div>
+        {% else %}
+        <input type="hidden" name="password" value="{{ user.password }}">
+        <input type="hidden" name="pci_info" value="{{ user.pci_info or '' }}">
+        <input type="hidden" name="profile_notes" value="{{ user.profile_notes or '' }}">
+        <input type="hidden" name="role" value="{{ user.role }}">
+        {% endif %}
         <div class="button-row button-row-space">
             <a href="{{ url_for('manage_users') }}" class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">Update User</button>
