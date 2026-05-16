@@ -1,21 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>New Payment Invoice</h2>
-<form method="POST">
-    <p><strong>Student Name:</strong></p>
-    <input type="text" name="student_name" required style="width:100%; padding:10px; margin-bottom:15px;">
+<h2 style="text-align:center; color:var(--primary);">Create New Payment Invoice</h2>
 
-    <p><strong>Course:</strong></p>
-    <input type="text" name="course" required style="width:100%; padding:10px; margin-bottom:15px;">
+<form method="POST" class="grid grid-2">
+    <div>
+        <p><strong>Student Full Name</strong></p>
+        <input type="text" name="student_name" required placeholder="Full Name">
 
-    <p><strong>Payment Type:</strong></p>
-    <input type="text" name="payment_type" placeholder="e.g. Full Course, Refresher" required style="width:100%; padding:10px; margin-bottom:15px;">
+        <p><strong>Course</strong></p>
+        <input type="text" name="course" required placeholder="e.g. Basic Driving, HGV">
+    </div>
 
-    <p><strong>Amount (TSh):</strong></p>
-    <input type="number" name="amount" required style="width:100%; padding:10px; margin-bottom:15px;">
+    <div>
+        <p><strong>Payment Type</strong></p>
+        <input type="text" name="payment_type" required placeholder="Full Course / Refresher / etc.">
 
-    <button type="submit" class="btn btn-primary" style="width:100%; padding:12px;">Generate Invoice</button>
+        <p><strong>Amount (TSh)</strong></p>
+        <input type="number" name="amount" required placeholder="250000">
+    </div>
+
+    <div style="grid-column: 1 / -1; margin-top:20px;">
+        <button type="submit" class="btn btn-primary" style="width:100%; padding:18px; font-size:1.1rem;">
+            Generate Invoice
+        </button>
+    </div>
 </form>
 
-<a href="{{ url_for('dashboard') }}" class="btn">← Back to Dashboard</a>
+<a href="{{ url_for('dashboard') }}" class="btn" style="margin-top:20px;">← Back to Dashboard</a>
 {% endblock %}

@@ -1,20 +1,27 @@
 import random
 import os
 from datetime import datetime
+from io import BytesIO
+
 from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+
+# For PDF + QR Code
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
 import qrcode
-from io import BytesIO
 
 app = Flask(__name__)
-app.secret_key = "brilliant-driving-school-2026"
+app.secret_key = "brilliant-driving-school-secret-2026"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///brilliant_school.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///brilliant_driving_school.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
+# Create upload folder
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 db = SQLAlchemy(app)
 
@@ -34,6 +41,7 @@ class Student(db.Model):
     email = db.Column(db.String(120))
     phone = db.Column(db.String(20), nullable=False)
     course = db.Column(db.String(100))
+    photo = db.Column(db.String(200))  # filename
     status = db.Column(db.String(20), default='Active')
     registration_date = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -47,52 +55,45 @@ class Payment(db.Model):
     date = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-# ====================== INIT ======================
+# ====================== DATABASE INIT ======================
 with app.app_context():
     db.create_all()
 
-# ====================== PDF INVOICE GENERATOR ======================
+# ====================== PDF INVOICE WITH QR CODE ======================
 def generate_pdf_invoice(payment):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
+    w, h = A4
 
     # Header
-    c.setFont("Helvetica-Bold", 20)
-    c.drawCentredString(width/2, height-80, "BRILLIANT DRIVING SCHOOL")
+    c.setFont("Helvetica-Bold", 22)
+    c.drawCentredString(w/2, h-80, "BRILLIANT DRIVING SCHOOL")
     c.setFont("Helvetica", 12)
-    c.drawCentredString(width/2, height-100, "Professional Driving Training | Dar es Salaam")
+    c.drawCentredString(w/2, h-100, "Professional Driving Training • Dar es Salaam")
 
-    # Invoice Details
+    # Invoice Info
     c.setFont("Helvetica-Bold", 14)
-    c.drawString(50, height-150, f"Invoice #: {payment.invoice_no}")
-    c.drawString(50, height-170, f"Date: {payment.date}")
+    c.drawString(50, h-160, f"Invoice Number: {payment.invoice_no}")
+    c.drawString(50, h-180, f"Date: {payment.date}")
 
     c.setFont("Helvetica", 12)
-    c.drawString(50, height-200, f"Student: {payment.student_name}")
-    c.drawString(50, height-220, f"Course: {payment.course}")
-    c.drawString(50, height-240, f"Payment Type: {payment.payment_type}")
+    c.drawString(50, h-210, f"Student Name: {payment.student_name}")
+    c.drawString(50, h-230, f"Course: {payment.course}")
+    c.drawString(50, h-250, f"Payment Type: {payment.payment_type}")
 
     # Amount
-    c.setFont("Helvetica-Bold", 16)
-    c.drawString(50, height-280, f"Amount Paid: TSh {payment.amount:,}")
+    c.setFont("Helvetica-Bold", 18)
+    c.drawString(50, h-290, f"Total Amount: TSh {payment.amount:,}")
 
     # QR Code
-    qr = qrcode.QRCode(version=1, box_size=4)
-    qr.add_data(f"INVOICE:{payment.invoice_no}\nSTUDENT:{payment.student_name}\nAMOUNT:{payment.amount}")
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
-    img.save("temp_qr.png")
+    qr = qrcode.make(f"INVOICE:{payment.invoice_no}|STUDENT:{payment.student_name}|AMOUNT:{payment.amount}")
+    qr.save("temp_qr.png")
+    c.drawImage("temp_qr.png", w-200, h-420, 150, 150)
 
-    c.drawImage("temp_qr.png", width-180, height-380, 150, 150)
-
-    # Approval Text
-    c.setFont("Helvetica-Bold", 14)
-    c.setFillColorRGB(0, 0.6, 0)
-    c.drawCentredString(width/2, height-450, "APPROVED FOR TEST")
-
-    c.setFont("Helvetica", 10)
-    c.drawCentredString(width/2, height-470, "Scan QR Code to Verify • Brilliant Driving School")
+    # Approval Seal
+    c.setFont("Helvetica-Bold", 16)
+    c.setFillColorRGB(0, 0.7, 0)
+    c.drawCentredString(w/2, h-480, "APPROVED FOR TEST")
 
     c.save()
     buffer.seek(0)
@@ -101,7 +102,19 @@ def generate_pdf_invoice(payment):
 # ====================== ROUTES ======================
 @app.route('/')
 def home():
-    return redirect(url_for('student_register'))
+    return render_template('home.html')
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    if session.get('user_type') == 'student':
+        return redirect(url_for('student_dashboard'))
+    
+    # For admin/owner
+    payments = Payment.query.order_by(Payment.created_at.desc()).all()
+    return render_template('dashboard.html', payments=payments)
 
 @app.route('/register', methods=['GET', 'POST'])
 def student_register():
@@ -113,20 +126,40 @@ def student_register():
 
         username = email or phone
         if User.query.filter_by(username=username).first():
-            flash('Already registered!', 'error')
+            flash('This email or phone is already registered!', 'error')
             return redirect(url_for('student_register'))
 
-        user = User(username=username, password=generate_password_hash('123456'),
-                    full_name=full_name, phone=phone, role='student')
+        # Handle photo upload
+        photo_filename = None
+        if 'photo' in request.files:
+            file = request.files['photo']
+            if file.filename:
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                photo_filename = filename
+
+        user = User(
+            username=username,
+            password=generate_password_hash('123456'),
+            full_name=full_name,
+            phone=phone,
+            role='student'
+        )
         db.session.add(user)
         db.session.commit()
 
-        student = Student(registration_number=f"BDS-{datetime.now().year}-{db.session.query(Student).count()+1:04d}",
-                         full_name=full_name, email=email, phone=phone, course=course)
+        student = Student(
+            registration_number=f"BDS-{datetime.now().year}-{Student.query.count()+1:04d}",
+            full_name=full_name,
+            email=email,
+            phone=phone,
+            course=course,
+            photo=photo_filename
+        )
         db.session.add(student)
         db.session.commit()
 
-        flash('Registration Successful!', 'success')
+        flash('Registration Successful! Default password is 123456', 'success')
         return redirect(url_for('login'))
 
     return render_template('student_register.html')
@@ -137,12 +170,13 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         user = User.query.filter_by(username=username).first()
+
         if user and check_password_hash(user.password, password):
             session['user'] = username
             session['full_name'] = user.full_name
-            flash('Login successful!', 'success')
+            flash('Login Successful!', 'success')
             return redirect(url_for('dashboard'))
-        flash('Invalid credentials', 'error')
+        flash('Invalid username or password', 'error')
     return render_template('login.html')
 
 @app.route('/dashboard')
@@ -176,7 +210,7 @@ def new_payment():
         db.session.add(payment)
         db.session.commit()
 
-        flash('Invoice Created!', 'success')
+        flash('Invoice Created Successfully!', 'success')
         return redirect(url_for('view_invoice', invoice_no=invoice_no))
 
     return render_template('new_payment.html')
@@ -190,17 +224,17 @@ def view_invoice(invoice_no):
 def download_invoice(invoice_no):
     payment = Payment.query.filter_by(invoice_no=invoice_no).first_or_404()
     pdf_buffer = generate_pdf_invoice(payment)
-    
     return send_file(
         pdf_buffer,
         as_attachment=True,
-        download_name=f"Invoice_{invoice_no}.pdf",
+        download_name=f"{invoice_no}.pdf",
         mimetype='application/pdf'
     )
 
 @app.route('/logout')
 def logout():
     session.clear()
+    flash('You have been logged out.', 'success')
     return redirect(url_for('login'))
 
 if __name__ == '__main__':

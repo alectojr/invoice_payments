@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 style="text-align:center; color:var(--primary);">Student Dashboard</h2>
+
+<div class="grid grid-2" style="margin:30px 0;">
+    <!-- Student Profile Card -->
+    <div style="background:#f8fafc; padding:25px; border-radius:12px;">
+        <h3>Your Profile</h3>
+        
+        {% if student and student.photo %}
+            <img src="{{ url_for('static', filename='uploads/' + student.photo) }}" 
+                 class="photo-preview" alt="Student Photo">
+        {% elif student %}
+            <div style="width:200px; height:200px; background:#ddd; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:15px 0;">
+                No Photo
+            </div>
+        {% endif %}
+
+        <p><strong>Name:</strong> {{ student.full_name if student else 'N/A' }}</p>
+        <p><strong>Reg Number:</strong> {{ student.registration_number if student else 'N/A' }}</p>
+        <p><strong>Course:</strong> {{ student.course if student else 'N/A' }}</p>
+        <p><strong>Phone:</strong> {{ student.phone if student else 'N/A' }}</p>
+        <p><strong>Status:</strong> <span style="color:green; font-weight:bold;">{{ student.status if student else 'N/A' }}</span></p>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="background:#f8fafc; padding:25px; border-radius:12px;">
+        <h3>Quick Actions</h3>
+        <a href="{{ url_for('new_payment') }}" class="btn btn-primary" style="width:100%; margin:10px 0; display:block; text-align:center;">
+            Create New Payment Invoice
+        </a>
+        <a href="{{ url_for('student_register') }}" class="btn btn-success" style="width:100%; margin:10px 0; display:block; text-align:center;">
+            Register Another Student
+        </a>
+    </div>
+</div>
+
+<!-- Payment History -->
+<h3>My Payment History</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Invoice No</th>
+            <th>Course</th>
+            <th>Payment Type</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in payments %}
+        <tr>
+            <td>{{ p.invoice_no }}</td>
+            <td>{{ p.course }}</td>
+            <td>{{ p.payment_type }}</td>
+            <td><strong>TSh {{ p.amount | int }}</strong></td>
+            <td>{{ p.date }}</td>
+            <td>
+                <a href="{{ url_for('download_invoice', invoice_no=p.invoice_no) }}" class="btn btn-success">↓ PDF</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6" style="text-align:center; padding:40px;">No payments recorded yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div style="text-align:center; margin-top:30px;">
+    <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+</div>
+{% endblock %}

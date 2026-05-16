@@ -3,35 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Brilliant Driving School Logo" style="display:block; margin: 20px auto; width: 150px;">
+    <img src="static/logo.png" alt="Driving School Background" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.1; z-index: -1;">
     <title>Brilliant Driving School</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f4f4; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .btn { padding: 10px 15px; text-decoration: none; border-radius: 5px; margin: 5px; }
-        .btn-primary { background: #1e3a8a; color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .flash { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        :root {
+            --primary: #1e3a8a;
+            --accent: #3b82f6;
+            --success: #10b981;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+                        url('https://unsplash.com/photos/a-person-driving-a-car-with-their-hand-on-the-steering-wheel-9QnzAzsssLI') center/cover no-repeat fixed;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: rgba(255,255,255,0.97);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .header h1 { margin: 0; font-size: 2.2rem; }
+        .header p { margin: 5px 0 0; opacity: 0.9; }
+
+        .content {
+            padding: 35px;
+        }
+
+        /* Responsive Grid */
+        .grid {
+            display: grid;
+            gap: 20px;
+        }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--accent); transform: translateY(-3px); }
+        .btn-success { background: var(--success); color: white; }
+
+        .flash {
+            padding: 14px 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-weight: 500;
+        }
         .success { background: #d1fae5; color: #065f46; }
         .error { background: #fee2e2; color: #991b1b; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-        th { background: #1e3a8a; color: white; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0 18px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+        }
+
+        .photo-preview {
+            width: 200px;
+            height: 200px;
+            border: 4px solid var(--primary);
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            .header h1 { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 style="text-align:center; color:#1e3a8a;">BRILLIANT DRIVING SCHOOL</h1>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, msg in messages %}
-                    <div class="flash {{ category }}">{{ msg }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        <div class="header">
+    <h1>BRILLIANT DRIVING SCHOOL</h1>
+    <p>Professional Driving Training • Dar es Salaam</p>
+    
+    <!-- Navigation Bar -->
+    <div style="margin-top: 15px;">
+        <a href="{{ url_for('home') }}" class="btn" style="background:rgba(255,255,255,0.2); color:white; margin:0 8px;">Home</a>
+        <a href="{{ url_for('student_register') }}" class="btn" style="background:rgba(255,255,255,0.2); color:white; margin:0 8px;">Register</a>
+        <a href="{{ url_for('login') }}" class="btn" style="background:rgba(255,255,255,0.2); color:white; margin:0 8px;">Login</a>
+        {% if session.get('user') %}
+            <a href="{{ url_for('dashboard') }}" class="btn" style="background:rgba(255,255,255,0.2); color:white; margin:0 8px;">Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger" style="margin:0 8px;">Logout</a>
+        {% endif %}
+    </div>
+</div>
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, msg in messages %}
+                        <div class="flash {{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-        {% block content %}{% endblock %}
+            {% block content %}{% endblock %}
+        </div>
     </div>
 </body>
 </html>

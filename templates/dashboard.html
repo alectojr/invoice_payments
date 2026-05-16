@@ -1,33 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Welcome, {{ session.full_name or 'Student' }}!</h2>
+<h2 style="text-align:center; color:var(--primary);">Welcome back, {{ session.full_name or 'Student' }}!</h2>
 
-<a href="{{ url_for('new_payment') }}" class="btn btn-primary">+ Create New Payment Invoice</a>
-<a href="{{ url_for('student_register') }}" class="btn btn-success">Register New Student</a>
-<a href="{{ url_for('logout') }}" class="btn" style="background:#ef4444; color:white;">Logout</a>
+<div class="grid grid-2" style="margin:30px 0;">
+    <a href="{{ url_for('new_payment') }}" class="btn btn-primary" style="text-align:center; padding:20px; font-size:1.1rem;">
+        ➕ Create New Payment Invoice
+    </a>
+    <a href="{{ url_for('student_register') }}" class="btn btn-success" style="text-align:center; padding:20px; font-size:1.1rem;">
+        👤 Register New Student
+    </a>
+</div>
 
-<h3 style="margin-top:30px;">Recent Payments</h3>
+<h3>Recent Invoices</h3>
 <table>
     <thead>
         <tr>
             <th>Invoice No</th>
-            <th>Student</th>
+            <th>Student Name</th>
             <th>Course</th>
             <th>Amount</th>
             <th>Date</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        {% for payment in payments %}
+        {% for p in payments %}
         <tr>
-            <td>{{ payment.invoice_no }}</td>
-            <td>{{ payment.student_name }}</td>
-            <td>{{ payment.course }}</td>
-            <td>TSh {{ payment.amount | int }}</td>
-            <td>{{ payment.date }}</td>
+            <td><strong>{{ p.invoice_no }}</strong></td>
+            <td>{{ p.student_name }}</td>
+            <td>{{ p.course }}</td>
+            <td><strong>TSh {{ p.amount | int }}</strong></td>
+            <td>{{ p.date }}</td>
+            <td>
+                <a href="{{ url_for('view_invoice', invoice_no=p.invoice_no) }}" class="btn btn-primary">View</a>
+                <a href="{{ url_for('download_invoice', invoice_no=p.invoice_no) }}" class="btn btn-success">↓ PDF</a>
+            </td>
         </tr>
         {% else %}
-        <tr><td colspan="5">No payments yet.</td></tr>
+        <tr>
+            <td colspan="6" style="text-align:center; padding:30px;">No invoices yet. Create your first invoice above.</td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>

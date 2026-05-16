@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Login</h2>
+<h2>Login to Your Account</h2>
 <form method="POST">
-    <p><strong>Username / Email:</strong></p>
-    <input type="text" name="username" required style="width:100%; padding:10px; margin-bottom:15px;">
+    <p><strong>Username / Email</strong></p>
+    <input type="text" name="username" required style="width:100%; padding:12px; margin-bottom:15px;">
 
-    <p><strong>Password:</strong></p>
-    <input type="password" name="password" required style="width:100%; padding:10px; margin-bottom:15px;">
+    <p><strong>Password</strong></p>
+    <input type="password" name="password" value="123456" required style="width:100%; padding:12px; margin-bottom:20px;">
 
-    <button type="submit" class="btn btn-primary" style="width:100%; padding:12px;">Login</button>
+    <button type="submit" class="btn btn-primary" style="width:100%; padding:14px;">Login</button>
 </form>
 
-<p style="text-align:center; margin-top:20px;">
-    New student? <a href="{{ url_for('student_register') }}">Register Here</a>
+<p style="text-align:center; margin-top:25px;">
+    New Student? <a href="{{ url_for('student_register') }}">Register Here</a>
 </p>
 {% endblock %}

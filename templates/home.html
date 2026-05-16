@@ -1,13 +1,32 @@
 {% extends "base.html" %}
-{% block body_class %}home{% endblock %}
 {% block content %}
-<div class="center-pane hero-card">
-    <span class="section-lead">Welcome</span>
-    <h2>Brilliant Driving School</h2>
-    <p>Choose your login type to access the payment management system.</p>
-    <div class="button-row spaced-row">
-        <a href="{{ url_for('staff_login') }}" class="btn btn-primary">Staff Login</a>
-        <a href="{{ url_for('login') }}" class="btn btn-secondary">Student Login</a>
+<div style="text-align: center; padding: 40px 20px;">
+    <h1 style="font-size: 2.8rem; color: var(--primary); margin-bottom: 8px;">
+        BRILLIANT DRIVING SCHOOL
+    </h1>
+    <p style="font-size: 1.4rem; color: #444; margin-bottom: 50px;">
+        Professional Driving Training • Dar es Salaam
+    </p>
+
+    <!-- Navigation Links -->
+    <div class="grid grid-2" style="max-width: 700px; margin: 0 auto 60px auto; gap: 20px;">
+        <a href="{{ url_for('student_register') }}" 
+           class="btn btn-primary" 
+           style="padding: 22px; font-size: 1.2rem;">
+            👤 New Student Registration
+        </a>
+        
+        <a href="{{ url_for('login') }}" 
+           class="btn btn-success" 
+           style="padding: 22px; font-size: 1.2rem;">
+            🔑 Login to Your Account
+        </a>
+    </div>
+
+    <div style="margin-top: 40px; color: #555;">
+        <p style="font-size: 1.1rem;">
+            <strong>Excellence in Driving Education Since 2015</strong>
+        </p>
     </div>
 </div>
 {% endblock %}
