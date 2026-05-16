@@ -14,25 +14,20 @@
     </div>
 
     <div class="container">
-        <nav>
-            <a href="{{ url_for('dashboard') }}">{{ translate('dashboard') }}</a>
-            
-            {% if user_type in ['admin', 'staff'] %}
-                <a href="{{ url_for('students_list') }}">Students</a>
-                <a href="{{ url_for('new_invoice') }}">New Invoice</a>
-                <a href="{{ url_for('manage_users') }}">Manage Users</a>
-            {% endif %}
-            
-            {% if user_type in ['admin', 'staff'] %}
-                <a href="{{ url_for('profile') }}">Profile</a>
-            {% endif %}
-            
-            <a href="{{ url_for('register/student') }}">Student Registration</a>
-            
-            {% if user_type %}
-                <a href="{{ url_for('logout') }}">Logout</a>
-            {% endif %}
-        </nav>
+       <nav>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    
+    {% if user_type in ['admin', 'staff'] %}
+        <a href="{{ url_for('students_list') }}">Students</a>
+        <a href="{{ url_for('new_invoice') }}">New Invoice</a>
+    {% endif %}
+    
+    <a href="{{ url_for('student_register') }}">Student Registration</a>
+    
+    {% if user_type %}
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% endif %}
+</nav>
 
         <div class="content">
             {% with messages = get_flashed_messages(with_categories=true) %}
