@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block body_class %}page-form{% endblock %}
+{% block content %}
+<div class="hero-card page-panel">
+    <div class="center-pane">
+        <span class="section-lead">Student Profile</span>
+        <h2>{{ student.full_name }}</h2>
+        <p><strong>Reg No:</strong> {{ student.registration_number }}</p>
+    </div>
+
+    <div class="profile-details">
+        <p><strong>Course:</strong> {{ student.course }}</p>
+        <p><strong>Status:</strong> <span class="status-{{ student.status.lower() }}">{{ student.status }}</span></p>
+        <p><strong>Phone:</strong> {{ student.phone }}</p>
+        <p><strong>Email:</strong> {{ student.email or 'Not provided' }}</p>
+        <p><strong>Gender:</strong> {{ student.gender or 'N/A' }}</p>
+        <p><strong>Date of Birth:</strong> {{ student.date_of_birth or 'N/A' }}</p>
+        <p><strong>Address:</strong> {{ student.address or 'N/A' }}</p>
+    </div>
+
+    <div class="button-row">
+        <a href="{{ url_for('students_list') }}" class="btn btn-secondary">Back to Students</a>
+        {% if student.status == 'Pending' %}
+            <a href="{{ url_for('approve_student', sid=student.id) }}" class="btn btn-success">Approve Student</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

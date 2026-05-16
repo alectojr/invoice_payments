@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero-card page-panel">
+    <h2>Student Self Registration</h2>
+    <form method="POST">
+        <input type="text" name="full_name" placeholder="Full Name" required class="form-field">
+        <input type="email" name="email" placeholder="Email" class="form-field">
+        <input type="text" name="phone" placeholder="Phone (+255...)" required class="form-field">
+        <input type="date" name="date_of_birth" class="form-field">
+        <select name="gender" class="form-field">
+            <option value="">Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        <select name="course" required class="form-field">
+            <option value="">Select Course</option>
+            <option value="Basic">Basic</option>
+            <option value="HGV">HGV</option>
+            <option value="PSV">PSV</option>
+        </select>
+        <textarea name="address" placeholder="Address" class="form-field"></textarea>
+        <button type="submit" class="btn btn-primary">Submit Registration</button>
+    </form>
+</div>
+{% endblock %}

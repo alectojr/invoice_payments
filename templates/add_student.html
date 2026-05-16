@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block body_class %}page-form{% endblock %}
+{% block content %}
+<div class="hero-card page-panel">
+    <div class="center-pane">
+        <span class="section-lead">Add Student</span>
+        <h2>Manual Student Registration</h2>
+    </div>
+    <form method="POST" class="form-grid form-spacing">
+        <input class="form-field" type="text" name="full_name" placeholder="Full Name" required>
+        <input class="form-field" type="email" name="email" placeholder="Email Address">
+        <input class="form-field" type="text" name="phone" placeholder="Phone Number (+255...)" required>
+        <input class="form-field" type="date" name="date_of_birth">
+        
+        <select class="form-field" name="gender">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        
+        <select class="form-field" name="course" required>
+            <option value="">Select Course</option>
+            <option value="Basic">Basic Driving</option>
+            <option value="HGV">Heavy Goods Vehicle (HGV)</option>
+            <option value="PSV">Public Service Vehicle (PSV)</option>
+        </select>
+        
+        <textarea class="form-field" name="address" rows="3" placeholder="Residential Address"></textarea>
+        
+        <div class="button-row button-row-space">
+            <a href="{{ url_for('students_list') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Add Student</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
