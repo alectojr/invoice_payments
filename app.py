@@ -196,7 +196,116 @@ def send_invoice_sms(course, student_name=None):
 
 # ====================== ROUTES ======================
 
-# Keep all your original routes (login, staff_login, new_invoice, view_invoice, etc.)
+# ====================== STUDENT ROUTES ======================
+
+@app.route('/register/student', methods=['GET', 'POST'])
+def student_register():
+    if request.method == 'POST':
+        full_name = request.form.get('full_name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        dob = request.form.get('date_of_birth')
+        gender = request.form.get('gender')
+        course = request.form.get('course')
+        address = request.form.get('address')
+
+        username = email or phone
+        if User.query.filter_by(username=username).first():
+            flash('Email or Phone already registered!', 'error')
+            return redirect(url_for('student_register'))
+
+        temp_pass = generate_temp_password()
+        user = User(
+            username=username,
+            password=generate_password_hash(temp_pass),
+            full_name=full_name,
+            phone=phone,
+            role='student'
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        student = Student(
+            full_name=full_name,
+            email=email,
+            phone=phone,
+            date_of_birth=dob,
+            gender=gender,
+            course=course,
+            address=address,
+            user_id=user.id
+        )
+        db.session.add(student)
+        db.session.commit()
+
+        flash('Registration successful! Waiting for staff approval.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('student_register.html')
+
+
+@app.route('/students')
+def students_list():
+    if session.get('user_type') not in ['admin', 'staff']:
+        flash('Access denied!', 'error')
+        return redirect(url_for('dashboard'))
+    
+    search = request.args.get('search', '')
+    students = Student.query.order_by(Student.enrollment_date.desc()).all()
+    return render_template('students_list.html', students=students, search=search)
+
+
+@app.route('/students/add', methods=['GET', 'POST'])
+def add_student():
+    if session.get('user_type') not in ['admin', 'staff']:
+        flash('Access denied!', 'error')
+        return redirect(url_for('dashboard'))
+    
+    if request.method == 'POST':
+        student = Student(
+            full_name=request.form.get('full_name'),
+            email=request.form.get('email'),
+            phone=request.form.get('phone'),
+            date_of_birth=request.form.get('date_of_birth'),
+            gender=request.form.get('gender'),
+            course=request.form.get('course'),
+            address=request.form.get('address'),
+            status='Approved',
+            approved_by=session.get('user'),
+            approved_at=datetime.utcnow()
+        )
+        db.session.add(student)
+        db.session.commit()
+        flash('Student added successfully!', 'success')
+        return redirect(url_for('students_list'))
+    
+    return render_template('add_student.html')
+
+
+@app.route('/students/approve/<int:sid>')
+def approve_student(sid):
+    if session.get('user_type') not in ['admin', 'staff']:
+        flash('Access denied!', 'error')
+        return redirect(url_for('students_list'))
+    student = Student.query.get_or_404(sid)
+    student.status = 'Approved'
+    student.approved_by = session.get('user')
+    student.approved_at = datetime.utcnow()
+    db.session.commit()
+    flash('Student approved successfully!', 'success')
+    return redirect(url_for('students_list'))
+
+
+@app.route('/students/reject/<int:sid>')
+def reject_student(sid):
+    if session.get('user_type') not in ['admin', 'staff']:
+        flash('Access denied!', 'error')
+        return redirect(url_for('students_list'))
+    student = Student.query.get_or_404(sid)
+    student.status = 'Rejected'
+    db.session.commit()
+    flash('Student rejected.', 'error')
+    return redirect(url_for('students_list'))
 
 # === NEW STUDENT REGISTRATION ===
 @app.route('/register/student', methods=['GET', 'POST'])
